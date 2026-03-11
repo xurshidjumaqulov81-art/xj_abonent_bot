@@ -64,7 +64,7 @@ async def send_start_banner(message: Message) -> None:
         )
 
 
-async def send_catalog(target, edit: bool = False) -> None:
+async def send_catalog(target) -> None:
     products = get_all_products()
     text = (
         "🛍 <b>МАҲСУЛОТЛАР КАТАЛОГИ</b>\n\n"
@@ -73,13 +73,10 @@ async def send_catalog(target, edit: bool = False) -> None:
     )
     keyboard = products_keyboard(products)
 
-    if edit and hasattr(target, "message") and target.message:
-        await target.message.edit_text(text, reply_markup=keyboard)
+    if isinstance(target, Message):
+        await target.answer(text, reply_markup=keyboard)
     else:
-        if isinstance(target, Message):
-            await target.answer(text, reply_markup=keyboard)
-        else:
-            await target.message.answer(text, reply_markup=keyboard)
+        await target.message.answer(text, reply_markup=keyboard)
 
 
 def build_review_text(data: dict) -> str:
@@ -95,8 +92,8 @@ def build_review_text(data: dict) -> str:
     )
 
 
-def build_admin_text(order_id: int, user: Message, data: dict) -> str:
-    username = f"@{user.from_user.username}" if user.from_user.username else "йўқ"
+def build_admin_text(order_id: int, telegram_username: str | None, data: dict) -> str:
+    username = f"@{telegram_username}" if telegram_username else "йўқ"
     return (
         "🛒 <b>ЯНГИ БУЮРТМА</b>\n\n"
         f"📦 <b>Буюртма рақами:</b> #{order_id}\n"
@@ -162,7 +159,13 @@ async def get_full_name(message: Message, state: FSMContext):
 @router.callback_query(F.data == "back_to_catalog")
 async def back_to_catalog(callback: CallbackQuery, state: FSMContext):
     await state.set_state(OrderStates.waiting_for_product)
-    await send_catalog(callback, edit=True)
+
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    await send_catalog(callback)
     await callback.answer()
 
 
@@ -309,7 +312,13 @@ async def get_address(message: Message, state: FSMContext):
 @router.callback_query(OrderStates.waiting_for_review, F.data == "edit_order")
 async def edit_order(callback: CallbackQuery, state: FSMContext):
     await state.set_state(OrderStates.waiting_for_product)
-    await send_catalog(callback, edit=True)
+
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    await send_catalog(callback)
     await callback.answer()
 
 
@@ -346,7 +355,7 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext):
         address=data["address"],
     )
 
-    admin_text = build_admin_text(order_id, callback.message, data)
+    admin_text = build_admin_text(order_id, callback.from_user.username, data)
     await callback.bot.send_message(
         chat_id=config.admin_id,
         text=admin_text,
