@@ -10,3 +10,7 @@ class OrderStates(StatesGroup):
     waiting_for_region = State()
     waiting_for_address = State()
     waiting_for_review = State()
+
+
+class BroadcastStates(StatesGroup):
+    waiting_for_message = State()
