@@ -9,7 +9,7 @@ config = load_config()
 
 
 def is_admin(user_id: int) -> bool:
-    return user_id == config.admin_id
+    return user_id in config.admin_ids
 
 
 @router.callback_query(F.data.startswith("admin:"))
