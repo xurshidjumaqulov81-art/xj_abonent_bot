@@ -92,19 +92,31 @@ def build_review_text(data: dict) -> str:
     )
 
 
-def build_admin_text(order_id: int, telegram_username: str | None, data: dict) -> str:
-    username = f"@{telegram_username}" if telegram_username else "йўқ"
+def build_admin_text(
+    order_id: int,
+    telegram_user_id: int,
+    telegram_username: str | None,
+    data: dict
+) -> str:
+    if telegram_username:
+        profile_link = f"https://t.me/{telegram_username}"
+        profile_text = f'<a href="{profile_link}">@{telegram_username}</a>'
+    else:
+        profile_link = f"tg://user?id={telegram_user_id}"
+        profile_text = f'<a href="{profile_link}">ФОЙДАЛАНУВЧИ ПРОФИЛИ</a>'
+
     return (
         "🛒 <b>ЯНГИ БУЮРТМА</b>\n\n"
         f"📦 <b>Буюртма рақами:</b> #{order_id}\n"
         f"🆔 <b>ID:</b> {data['customer_id_code']}\n"
         f"👤 <b>ИСМ ФАМИЛИЯ:</b> {data['full_name']}\n"
-        f"📱 <b>ТЕЛЕГРАМ:</b> {username}\n"
+        f"📱 <b>ТЕЛЕГРАМ:</b> {profile_text}\n"
         f"🧴 <b>МАҲСУЛОТ:</b> {data['product_name']}\n"
         f"📞 <b>ҚАБУЛ ҚИЛУВЧИ РАҚАМ:</b> {data['phone']}\n"
         f"🌍 <b>ДАВЛАТ:</b> {data['country']}\n"
         f"📍 <b>ВИЛОЯТ:</b> {data['region']}\n"
-        f"🏠 <b>МАНЗИЛ:</b> {data['address']}"
+        f"🏠 <b>МАНЗИЛ:</b> {data['address']}\n\n"
+        f"🔗 <b>ПРОФИЛГА ЎТИШ:</b> {profile_text}"
     )
 
 
@@ -325,7 +337,10 @@ async def edit_order(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(OrderStates.waiting_for_review, F.data == "cancel_order")
 async def cancel_order(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.answer("❌ Буюртма бекор қилинди.", reply_markup=start_keyboard())
+    await callback.message.answer(
+        "❌ Буюртма бекор қилинди.",
+        reply_markup=start_keyboard()
+    )
     await callback.answer()
 
 
@@ -336,7 +351,9 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext):
 
     success = decrease_stock(product_slug, 1)
     if not success:
-        await callback.message.answer("❌ Ушбу маҳсулот тугаган. Илтимос, бошқа маҳсулот танланг.")
+        await callback.message.answer(
+            "❌ Ушбу маҳсулот тугаган. Илтимос, бошқа маҳсулот танланг."
+        )
         await state.set_state(OrderStates.waiting_for_product)
         await send_catalog(callback)
         await callback.answer()
@@ -355,7 +372,13 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext):
         address=data["address"],
     )
 
-    admin_text = build_admin_text(order_id, callback.from_user.username, data)
+    admin_text = build_admin_text(
+        order_id,
+        callback.from_user.id,
+        callback.from_user.username,
+        data
+    )
+
     await callback.bot.send_message(
         chat_id=config.admin_id,
         text=admin_text,
