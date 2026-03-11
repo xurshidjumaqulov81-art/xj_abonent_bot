@@ -379,8 +379,9 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext):
         data
     )
 
+for admin_id in config.admin_ids:
     await callback.bot.send_message(
-        chat_id=config.admin_id,
+        chat_id=admin_id,
         text=admin_text,
         reply_markup=admin_order_keyboard(order_id),
     )
