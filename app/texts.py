@@ -74,7 +74,7 @@ COUNTRY_REGIONS = {
 PRODUCTS = {
     "xj_eye_cream": {
         "name": "XJ EYE CREAM",
-        "stock": 15,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_eye_cream.jpg"),
         "description": (
             "🧴 <b>XJ EYE CREAM</b>\n\n"
@@ -90,7 +90,7 @@ PRODUCTS = {
     },
     "xj_day_cream": {
         "name": "XJ DAY CREAM",
-        "stock": 15,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_day_cream.jpg"),
         "description": (
             "🧴 <b>XJ DAY CREAM</b>\n\n"
@@ -106,7 +106,7 @@ PRODUCTS = {
     },
     "xj_night_cream": {
         "name": "XJ NIGHT CREAM",
-        "stock": 15,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_night_cream.jpg"),
         "description": (
             "🧴 <b>XJ NIGHT CREAM</b>\n\n"
@@ -123,7 +123,7 @@ PRODUCTS = {
     },
     "xj_cleansing_oil": {
         "name": "XJ CLEANSING OIL",
-        "stock": 14,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_cleansing_oil.jpg"),
         "description": (
             "🧴 <b>XJ CLEANSING OIL</b>\n\n"
@@ -139,7 +139,7 @@ PRODUCTS = {
     },
     "xj_face_toner": {
         "name": "XJ FACE TONER",
-        "stock": 14,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_face_toner.jpg"),
         "description": (
             "🧴 <b>XJ FACE TONER</b>\n\n"
@@ -155,7 +155,7 @@ PRODUCTS = {
     },
     "xj_24k_gold_serum": {
         "name": "XJ 24K GOLD SERUM",
-        "stock": 14,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_24k_gold_serum.jpg"),
         "description": (
             "🧴 <b>XJ 24K GOLD SERUM</b>\n\n"
@@ -173,7 +173,7 @@ PRODUCTS = {
     },
     "xj_face_wash": {
         "name": "XJ FACE WASH",
-        "stock": 13,
+        "stock": 16,
         "photo": str(ASSETS_DIR / "xj_face_wash.jpg"),
         "description": (
             "🧴 <b>XJ FACE WASH</b>\n\n"
