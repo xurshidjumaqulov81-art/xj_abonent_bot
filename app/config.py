@@ -8,20 +8,14 @@ load_dotenv()
 @dataclass
 class Config:
     bot_token: str
-    admin_id: int
-    db_path: str = "bot.db"
+    admin_ids: list
 
 
 def load_config() -> Config:
-    bot_token = os.getenv("BOT_TOKEN", "").strip()
-    admin_id_raw = os.getenv("ADMIN_ID", "").strip()
-
-    if not bot_token:
-        raise ValueError("BOT_TOKEN topilmadi.")
-    if not admin_id_raw.isdigit():
-        raise ValueError("ADMIN_ID noto'g'ri.")
+    bot_token = os.getenv("BOT_TOKEN")
+    admin_ids = os.getenv("ADMIN_IDS")
 
     return Config(
         bot_token=bot_token,
-        admin_id=int(admin_id_raw),
+        admin_ids=[int(x) for x in admin_ids.split(",")]
     )
