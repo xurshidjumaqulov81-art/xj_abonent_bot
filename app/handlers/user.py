@@ -339,7 +339,7 @@ async def cancel_order(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await callback.message.answer(
         "❌ Буюртма бекор қилинди.",
-        reply_markup=start_keyboard()
+        reply_markup=start_keyboard(),
     )
     await callback.answer()
 
@@ -376,15 +376,15 @@ async def confirm_order(callback: CallbackQuery, state: FSMContext):
         order_id,
         callback.from_user.id,
         callback.from_user.username,
-        data
+        data,
     )
 
-for admin_id in config.admin_ids:
-    await callback.bot.send_message(
-        chat_id=admin_id,
-        text=admin_text,
-        reply_markup=admin_order_keyboard(order_id),
-    )
+    for admin_id in config.admin_ids:
+        await callback.bot.send_message(
+            chat_id=admin_id,
+            text=admin_text,
+            reply_markup=admin_order_keyboard(order_id),
+        )
 
     await callback.message.answer(
         SUCCESS_TEXT,
