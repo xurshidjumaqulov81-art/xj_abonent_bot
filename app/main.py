@@ -4,6 +4,7 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
 from app.config import load_config
+from app.handlers import user
 
 
 async def start():
@@ -15,6 +16,8 @@ async def start():
     )
 
     dp = Dispatcher()
+
+    dp.include_router(user.router)
 
     print("Bot ishga tushdi...")
 
