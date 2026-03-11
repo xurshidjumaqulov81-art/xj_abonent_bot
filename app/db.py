@@ -156,3 +156,12 @@ def update_order_status(order_id: int, status: str) -> None:
     cur.execute("UPDATE orders SET status = ? WHERE id = ?", (status, order_id))
     conn.commit()
     conn.close()
+
+
+def get_all_user_ids() -> list[int]:
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT DISTINCT telegram_user_id FROM orders")
+    rows = cur.fetchall()
+    conn.close()
+    return [row["telegram_user_id"] for row in rows]
