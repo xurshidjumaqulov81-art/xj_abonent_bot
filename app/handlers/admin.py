@@ -1,8 +1,11 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 
 from app.config import load_config
-from app.db import get_order, update_order_status, increase_stock
+from app.db import get_order, update_order_status, increase_stock, get_all_user_ids
+from app.states import BroadcastStates
 
 router = Router()
 config = load_config()
@@ -71,3 +74,57 @@ async def admin_actions(callback: CallbackQuery):
         return
 
     await callback.answer("Номаълум амал", show_alert=True)
+
+
+@router.message(Command("sendall"))
+async def start_broadcast(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        await message.answer("Сиз админ эмассиз.")
+        return
+
+    await message.answer(
+        "📢 Ҳаммага юбориладиган хабарни киритинг.\n\n"
+        "Бекор қилиш учун: /cancel_broadcast"
+    )
+    await state.set_state(BroadcastStates.waiting_for_message)
+
+
+@router.message(Command("cancel_broadcast"))
+async def cancel_broadcast(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        await message.answer("Сиз админ эмассиз.")
+        return
+
+    await state.clear()
+    await message.answer("❌ Рассылка бекор қилинди.")
+
+
+@router.message(BroadcastStates.waiting_for_message)
+async def send_broadcast(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        await message.answer("Сиз админ эмассиз.")
+        return
+
+    user_ids = get_all_user_ids()
+
+    if not user_ids:
+        await message.answer("Фойдаланувчилар топилмади.")
+        await state.clear()
+        return
+
+    success_count = 0
+    fail_count = 0
+
+    for user_id in user_ids:
+        try:
+            await message.bot.send_message(user_id, message.text)
+            success_count += 1
+        except Exception:
+            fail_count += 1
+
+    await message.answer(
+        f"✅ Рассылка якунланди.\n\n"
+        f"Юборилди: {success_count}\n"
+        f"Бор мади: {fail_count}"
+    )
+    await state.clear()
